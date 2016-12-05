@@ -2,26 +2,27 @@
 namespace Turtle;
 
 use \Turtle\MutableDirection as MutableDirection;
+use \Turtle\Coordinate as Coordinate;
 
 class Turtle {
-    protected $x, $y;
+    protected $coord;
     protected $direction;
 
     public function __construct() {
-        $this->x = 0;
-        $this->y = 0;
-        $this->direction = new Mutabledirection('N');
+        $this->coord = new Coordinate();
+        $this->direction = new MutableDirection('N');
     }
 
-    public function getX() { return $this->x; }
-    public function getY() { return $this->y; }
+    public function getX() { return $this->coord->getX(); }
+    public function getY() { return $this->coord->getY(); }
+    public function getCoordinate() { return $this->coord; }
 
     public function getEuclideanDistance() {
-        return sqrt($this->x*$this->x + $this->y*$this->y);
+        return $this->coord->getEuclideanDistance(null);
     }
 
     public function getCardinalStepdistance() {
-        return abs($this->x) + abs($this->y);
+        return $this->coord->getCardinalStepdistance(null);
     }
 
     public function turn($direction) {
@@ -40,8 +41,7 @@ class Turtle {
         $xMovement = $matrix[$this->direction->__toString()][0] * $n;
         $yMovement = $matrix[$this->direction->__toString()][1] * $n;
 
-        $this->x += $xMovement;
-        $this->y += $yMovement;
+        $this->coord = $this->coord->translateBy(new Coordinate($xMovement, $yMovement));
     }
 
     public function takeAction($actionString) {
@@ -53,7 +53,7 @@ class Turtle {
             $this->turn($rotation);
             $this->move($n);
         } else {
-            throw new InvalidArgumentException('the action must be numeric followed by L or R');
+            throw new \InvalidArgumentException('the action must be numeric followed by L or R');
         }
 
     }

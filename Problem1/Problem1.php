@@ -1,5 +1,6 @@
 <?php
 
+require_once(__DIR__ . '/Turtle/Coordinate.php');
 require_once(__DIR__ . '/Turtle/Turtle.php');
 require_once(__DIR__ . '/Turtle/MutableDirection.php');
 
