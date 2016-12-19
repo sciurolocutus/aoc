@@ -30,8 +30,26 @@ class RoomSpec {
     }
     
     public function calculateChecksum() {
+        $reduced = self::findNMostCommonLetters($this->strPart, 5, function($a, $b) {
+            if($a['count'] === $b['count']) {
+                //echo "$a[letter] and $b[letter] have the same heat-map value of ", $a['count'], "\n";
+                return \strcmp($a['letter'], $b['letter']);
+            } else {
+                //echo "$a[letter] and $b[letter] have different heat-map values.\n";
+                return $b['count'] - $a['count'];
+            }
+        });
+        
+        $answer = array_reduce($reduced, function($a, $b) {
+            return $a . $b['letter'];
+        }, '');
+        
+        return $answer;
+    }
+    
+    public static function findNMostCommonLetters($str, $n=1, $callable=null) {
         $heatMap = array();
-        foreach(str_split($this->strPart) as $letter) {
+        foreach(str_split($str) as $letter) {
             if($letter === '-') {
                 continue;
             }
@@ -50,22 +68,16 @@ class RoomSpec {
             );
         }
         
-        usort($hm, function($a, $b) {
-            if($a['count'] === $b['count']) {
-                //echo "$a[letter] and $b[letter] have the same heat-map value of ", $a['count'], "\n";
-                return \strcmp($a['letter'], $b['letter']);
-            } else {
-                //echo "$a[letter] and $b[letter] have different heat-map values.\n";
+        if(isset($callable) && is_callable($callable)) {
+            usort($hm, $callable);
+        } else {
+            usort($hm, function($a, $b) {
                 return $b['count'] - $a['count'];
-            }
-        });
+            });
+        }
         
-        $reduced = array_slice($hm, 0, 5);
-        $answer = array_reduce($reduced, function($a, $b) {
-            return $a . $b['letter'];
-        }, '');
-        
-        return $answer;
+        $reduced = array_slice($hm, 0, $n);
+        return $reduced;
     }
     
     public function validateChecksum() {
